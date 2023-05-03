@@ -6,6 +6,8 @@ import com.yafdev.oms.productmicroservice.entity.Product;
 import com.yafdev.oms.productmicroservice.repository.ProductRepository;
 import com.yafdev.oms.productmicroservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,39 +18,56 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
+    private static final Logger log = LogManager.getLogger(ProductServiceImpl.class);
+
     private final ProductRepository productRepository;
     private final ProductConverter converter;
 
     @Override
     public List<ProductDTO> getAllProducts() {
+        log.info("Entry to service get all products.");
         List<Product> products = productRepository.findAll();
         if(products.isEmpty()) {
-            throw new RuntimeException("Lista de productos vacia");
+            throw new RuntimeException("Empty product list");
         }
         return formatResponse(products);
     }
 
     @Override
     public void createProduct(ProductDTO productDTO) {
+        log.info("Entry to service create product.");
         Product product = converter.productDtoToEntity(productDTO);
         productRepository.save(product);
     }
 
     @Override
     public ProductDTO getProductBySku(String sku) {
-        Optional<Product> product = productRepository.findBySku(sku);
-        Product productFound = product.orElseThrow(()-> new RuntimeException("El optional esta vacio"));
-        //Product productFound = productRepository.findBySku(sku);
-        ProductDTO productDTO = converter.productEntityToDTO(productFound);
-
-        return productDTO;
+        log.info("Entry to service get product by sku.");
+        return converter.productEntityToDTO(findProductBySKU(sku));
     }
 
     @Override
     public ProductDTO updateProduct(ProductDTO productDTO) {
+        log.info("Entry to service update product.");
+        Product productFound = findProductBySKU(productDTO.getSku());
+        log.info("Product: " + productFound.toString());
+        productRepository.save(productFound);
+        log.info("Updated product");
+        return converter.productEntityToDTO(productFound);
+    }
 
-        Product product = null;
-        return null;
+    @Override
+    public void deleteProduct(String sku) {
+        log.info("Entry to service delete product.");
+        Product productFound = findProductBySKU(sku);
+        log.info("Product: " + productFound.toString());
+        productRepository.delete(productFound);
+    }
+
+    public void deleteAll() {
+        log.info("Entry to service delete all.");
+        productRepository.deleteAll();
+        log.info("Empty database");
     }
 
     private List<ProductDTO> formatResponse(List<Product> products) {
@@ -58,5 +77,10 @@ public class ProductServiceImpl implements ProductService {
             productsDTO.add(productDTO);
         }
         return productsDTO;
+    }
+
+    private Product findProductBySKU(String sku) {
+        Optional<Product> product = productRepository.findBySku(sku);
+        return product.orElseThrow(()-> new RuntimeException("Product not found, sku: " + sku));
     }
 }

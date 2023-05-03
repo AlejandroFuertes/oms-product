@@ -39,4 +39,16 @@ public class ProductController {
         productService.updateProduct(productDTO);
         return null;
     }
+
+    @DeleteMapping("/delete/{sku}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteProduct(@RequestParam String sku) {
+        productService.deleteProduct(sku);
+    }
+
+    @DeleteMapping("/delete/all")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteAllProducts() {
+        productService.deleteAll();
+    }
 }
