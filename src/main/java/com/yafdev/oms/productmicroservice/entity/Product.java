@@ -20,6 +20,7 @@ public class Product {
 
     @Id
     private String id;
+    @Indexed(unique = true)
     private String sku;
     private String companyCode;
     private String description;

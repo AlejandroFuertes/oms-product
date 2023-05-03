@@ -3,6 +3,7 @@ package com.yafdev.oms.productmicroservice.service.impl;
 import com.yafdev.oms.productmicroservice.converter.ProductConverter;
 import com.yafdev.oms.productmicroservice.dto.ProductDTO;
 import com.yafdev.oms.productmicroservice.entity.Product;
+import com.yafdev.oms.productmicroservice.exception.ProductNotFoundException;
 import com.yafdev.oms.productmicroservice.repository.ProductRepository;
 import com.yafdev.oms.productmicroservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService {
 
     private static final Logger log = LogManager.getLogger(ProductServiceImpl.class);
+    private static final String PRODUCT_NOT_FOUND = "Product not found";
+    private static final String EMPTY_LIST = "No products in the database";
 
     private final ProductRepository productRepository;
     private final ProductConverter converter;
@@ -26,9 +29,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDTO> getAllProducts() {
         log.info("Entry to service get all products.");
-        List<Product> products = productRepository.findAll();
-        if(products.isEmpty()) {
-            throw new RuntimeException("Empty product list");
+        List<Product> products = productRepository.findAll();;
+        if (products.isEmpty()) {
+            throw new ProductNotFoundException(EMPTY_LIST);
         }
         return formatResponse(products);
     }
@@ -81,6 +84,6 @@ public class ProductServiceImpl implements ProductService {
 
     private Product findProductBySKU(String sku) {
         Optional<Product> product = productRepository.findBySku(sku);
-        return product.orElseThrow(()-> new RuntimeException("Product not found, sku: " + sku));
+        return product.orElseThrow(()-> new ProductNotFoundException(PRODUCT_NOT_FOUND));
     }
 }

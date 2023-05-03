@@ -2,6 +2,7 @@ package com.yafdev.oms.productmicroservice.controller;
 
 import com.yafdev.oms.productmicroservice.dto.ProductDTO;
 import com.yafdev.oms.productmicroservice.service.ProductService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class ProductController {
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public ProductDTO getProductBySku(@RequestParam String sku) {
+    public ProductDTO getProductBySku(@RequestParam String sku, HttpServletResponse response) {
         return productService.getProductBySku(sku);
     }
 
@@ -40,14 +41,14 @@ public class ProductController {
         return null;
     }
 
-    @DeleteMapping("/delete/{sku}")
-    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@RequestParam String sku) {
         productService.deleteProduct(sku);
     }
 
     @DeleteMapping("/delete/all")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllProducts() {
         productService.deleteAll();
     }
