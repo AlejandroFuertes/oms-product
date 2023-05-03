@@ -8,7 +8,9 @@ import com.yafdev.oms.productmicroservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,8 +20,12 @@ public class ProductServiceImpl implements ProductService {
     private final ProductConverter converter;
 
     @Override
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductDTO> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+        if(products.isEmpty()) {
+            throw new RuntimeException("Lista de productos vacia");
+        }
+        return formatResponse(products);
     }
 
     @Override
@@ -29,7 +35,28 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product getProductBySku(String sku) {
+    public ProductDTO getProductBySku(String sku) {
+        Optional<Product> product = productRepository.findBySku(sku);
+        Product productFound = product.orElseThrow(()-> new RuntimeException("El optional esta vacio"));
+        //Product productFound = productRepository.findBySku(sku);
+        ProductDTO productDTO = converter.productEntityToDTO(productFound);
+
+        return productDTO;
+    }
+
+    @Override
+    public ProductDTO updateProduct(ProductDTO productDTO) {
+
+        Product product = null;
         return null;
+    }
+
+    private List<ProductDTO> formatResponse(List<Product> products) {
+        List<ProductDTO> productsDTO = new ArrayList<>();
+        for (Product product: products) {
+            ProductDTO productDTO = converter.productEntityToDTO(product);
+            productsDTO.add(productDTO);
+        }
+        return productsDTO;
     }
 }

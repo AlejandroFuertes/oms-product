@@ -7,7 +7,8 @@ import java.util.List;
 
 public interface ProductService {
 
-    List<Product> getAllProducts();
+    List<ProductDTO> getAllProducts();
     void createProduct(ProductDTO productDTO);
-    Product getProductBySku(String sku);
+    ProductDTO getProductBySku(String sku);
+    ProductDTO updateProduct(ProductDTO productDTO);
 }
