@@ -29,7 +29,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductDTO> getAllProducts() {
         log.info("Entry to service get all products.");
-        List<Product> products = productRepository.findAll();;
+        List<Product> products = productRepository.findAll();
         if (products.isEmpty()) {
             throw new ProductNotFoundException(EMPTY_LIST);
         }
